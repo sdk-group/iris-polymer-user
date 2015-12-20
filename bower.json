@@ -1,0 +1,26 @@
+{
+  "name": "iris-polymer-usercard",
+  "homepage": "https://github.com/sdk-group/iris-polymer-usercard",
+  "authors": [
+    "artificial-life <proteus.protocol@gmail.com>"
+  ],
+  "description": "user card",
+  "main": "iris-usercard.html",
+  "moduleType": [],
+  "keywords": [
+    "polymer",
+    "user",
+    "iris"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "iris-polymer-importer": "https://github.com/sdk-group/iris-polymer-importer.git"
+  }
+}

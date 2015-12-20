@@ -1,0 +1,81 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iris-polymer-importer/iris-importer.html">
+<link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../../bower_components/iron-icons/social-icons.html">
+
+<dom-module id="iris-usercard">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host {
+        display: block;
+      }
+      
+      .user-card > div {
+        display: inline-block;
+      }
+      
+      paper-fab.blue {
+        --paper-fab-background: var(--paper-light-blue-500);
+        --paper-fab-keyboard-focus-background: var(--paper-light-blue-900);
+      }
+      
+      paper-fab {
+        @apply(--shadow-none);
+      }
+      
+      #log-indicator {
+        border-radius: 50%;
+      }
+      
+      #log-indicator.active {
+        box-shadow: 0 0 10px 3px rgba(0, 176, 0, 0.75);
+        transition: box-shadow 0.75s ease-in-out 0s;
+      }
+      
+      .user-info {
+        padding-left: 15px;
+      }
+    </style>
+    <div class='user-card'>
+      <div id="log-indicator">
+        <paper-fab class="blue" icon="social:person" elevation="0"></paper-fab>
+      </div>
+      <template is="dom-if" if="{{fields.logged_in}}">
+        <div class="user-info">
+          <div class="middle title">{{fields.name}}</div>
+          <div class="bottom title">{{fields.lastname}}</div>
+        </div>
+      </template>
+    </div>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+      Polymer({
+        is: 'iris-usercard',
+        properties: {
+          api: Object
+        },
+        ready() {
+          console.log('ready', this);
+          let user = this.api.require('user');
+          this.fields = user.fields
+
+          user.on('changed', (result) => {
+            this.notifyPath('fields.logged_in', this.fields.logged_in);
+            if (user.fields.logged_in) {
+              this.$["log-indicator"].classList.add("active");
+            } else {
+              this.$["log-indicator"].classList.remove("active");
+            }
+          });
+
+        }
+      });
+    })();
+  </script>
+
+</dom-module>
