@@ -1,7 +1,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iris-polymer-importer/iris-importer.html">
 <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
 
 <dom-module id="iris-usercard">
   <template>
@@ -11,43 +14,69 @@
         display: block;
       }
       
-      .user-card > div {
-        display: inline-block;
+      .operator-photo {
+        width: 60px;
+        height: 60px;
+        border: 1px solid var(--paper-grey-300);
+        margin-right: 15px;
       }
       
-      paper-fab.blue {
-        --paper-fab-background: var(--paper-light-blue-500);
-        --paper-fab-keyboard-focus-background: var(--paper-light-blue-900);
+      #info .content {
+        @apply(--layout-horizontal);
+        @apply(--layout-top);
+        padding: 15px;
       }
       
-      paper-fab {
-        @apply(--shadow-none);
+      .online {
+        color: var(--paper-light-green-700);
       }
       
-      #log-indicator {
-        border-radius: 50%;
+      .offline {
+        color: var(--paper-grey-500);
       }
       
-      #log-indicator.active {
-        box-shadow: 0 0 10px 3px rgba(0, 176, 0, 0.75);
-        transition: box-shadow 0.75s ease-in-out 0s;
+      .online-status {
+        width: 13px;
       }
       
-      .user-info {
-        padding-left: 15px;
+      #info {
+        overflow: hidden;
+        border: 1px solid var(--paper-grey-300)
       }
     </style>
-    <div class='user-card'>
-      <div id="log-indicator">
-        <paper-fab class="blue" icon="social:person" elevation="0"></paper-fab>
-      </div>
-      <template is="dom-if" if="{{fields.logged_in}}">
-        <div class="user-info">
-          <div class="middle title">{{fields.name}}</div>
-          <div class="bottom title">{{fields.lastname}}</div>
+    <paper-toolbar justify='around'>
+      <paper-icon-button id="user-icon" class="offline" icon="social:person" on-tap="openmodal"></paper-icon-button>
+      <content></content>
+    </paper-toolbar>
+    <iron-collapse id="info">
+      <div class="content">
+        <div class="operator-photo">
         </div>
-      </template>
-    </div>
+        <div class="operator-info flex">
+          <div>
+            <span class="field">Имя:</span>
+            <span>{{fields.name}}</span>
+          </div>
+          <div>
+            <span class="field">Фамилия:</span>
+            <span>{{fields.lastname}}</span>
+          </div>
+          <div>
+            <template is="dom-if" if="{{fields.logged_in}}">
+              <iron-icon class="online-status online" icon="icons:radio-button-checked"></iron-icon> в сети
+            </template>
+            <template is="dom-if" if="{{!fields.logged_in}}">
+              <iron-icon class="online-status offline" icon="icons:radio-button-unchecked"></iron-icon> не в сети
+            </template>
+          </div>
+        </div>
+        <div class="operator-actions">
+          <paper-button>
+            <iron-icon icon="settings"></iron-icon>Настройки
+          </paper-button>
+        </div>
+      </div>
+    </iron-collapse>
 
   </template>
 
@@ -62,17 +91,25 @@
         ready() {
           console.log('ready', this);
           let user = this.api.require('user');
-          this.fields = user.fields
-
-          user.on('changed', (result) => {
-            this.notifyPath('fields.logged_in', this.fields.logged_in);
-            if (user.fields.logged_in) {
-              this.$["log-indicator"].classList.add("active");
+          this.info_open = false;
+          this.fields = {};
+          let classes = this.$["user-icon"].classList;
+          user.on('user.fields.changed', (fields) => {
+            this.set('fields', fields);
+            if (fields.logged_in) {
+              classes.add("online");
+              classes.remove("offline");
             } else {
-              this.$["log-indicator"].classList.remove("active");
+              classes.remove("online");
+              classes.add('offline');
             }
+            this.$["user-icon"].updateStyles();
           });
 
+        },
+        openmodal() {
+
+          this.$.info.toggle()
         }
       });
     })();
