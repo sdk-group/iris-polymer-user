@@ -14,69 +14,73 @@
         display: block;
       }
       
-      .operator-photo {
-        width: 60px;
-        height: 60px;
-        border: 1px solid var(--paper-grey-300);
-        margin-right: 15px;
-      }
-      
-      #info .content {
-        @apply(--layout-horizontal);
-        @apply(--layout-top);
-        padding: 15px;
-      }
-      
-      .online {
+      .online-status.online {
         color: var(--paper-light-green-700);
       }
       
-      .offline {
+      .online-status.offline {
         color: var(--paper-grey-500);
+      }
+      
+      .title {
+        min-height: 20px;
       }
       
       .online-status {
         width: 13px;
       }
       
-      #info {
-        overflow: hidden;
-        border: 1px solid var(--paper-grey-300)
+      .fields {
+        padding-left: 15px;
+      }
+      
+      iron-icon {
+        margin-top: -1px;
+      }
+      
+      .actions >::content paper-button {
+        float: right;
+      }
+      
+      .bottom.title {
+        font-size: 12px;
+      }
+      
+      #user-icon {
+        border-radius: 50%;
+      }
+      
+      #user-icon.blue {
+        padding: 14px;
+        background-color: var(--paper-light-blue-600);
+      }
+      
+      #user-icon.online {
+        box-shadow: 0 0 10px 2px rgba(0, 176, 0, 0.75);
       }
     </style>
-    <paper-toolbar justify='around'>
-      <paper-icon-button id="user-icon" class="offline" icon="social:person" on-tap="openmodal"></paper-icon-button>
-      <content></content>
-    </paper-toolbar>
-    <iron-collapse id="info">
-      <div class="content">
-        <div class="operator-photo">
+    <paper-toolbar>
+      <paper-icon-button icon="menu" on-tap="menuAction"></paper-icon-button>
+      <div id="user-icon" class="offline blue">
+        <iron-icon icon="social:person"></iron-icon>
+      </div>
+      <div class="fields ">
+        <div class="middle title">
+          <span class="field">{{fields.lastname}} {{fields.name}} {{fields.patronymic}}</span>
         </div>
-        <div class="operator-info flex">
-          <div>
-            <span class="field">Имя:</span>
-            <span>{{fields.name}}</span>
-          </div>
-          <div>
-            <span class="field">Фамилия:</span>
-            <span>{{fields.lastname}}</span>
-          </div>
-          <div>
-            <template is="dom-if" if="{{fields.logged_in}}">
-              <iron-icon class="online-status online" icon="icons:radio-button-checked"></iron-icon> в сети
-            </template>
-            <template is="dom-if" if="{{!fields.logged_in}}">
-              <iron-icon class="online-status offline" icon="icons:radio-button-unchecked"></iron-icon> не в сети
-            </template>
-          </div>
-        </div>
-        <div class="operator-actions">
-          <paper-button>
-            <iron-icon icon="settings"></iron-icon>Настройки
-          </paper-button>
+        <div class="bottom title">
+          <template is="dom-if" if="{{fields.logged_in}}">
+            <iron-icon class="online-status online" icon="icons:radio-button-checked"></iron-icon> в сети
+          </template>
+          <template is="dom-if" if="{{!fields.logged_in}}">
+            <iron-icon class="online-status offline" icon="icons:radio-button-unchecked"></iron-icon> не в сети
+          </template>
         </div>
       </div>
-    </iron-collapse>
+      <div class="actions flex">
+        <content></content>
+      </div>
+    </paper-toolbar>
 
   </template>
 
@@ -89,13 +93,16 @@
           api: Object
         },
         ready() {
-          console.log('ready', this);
           let user = this.api.require('user');
           this.info_open = false;
           this.fields = {};
           let classes = this.$["user-icon"].classList;
           user.on('user.fields.changed', (fields) => {
-            this.set('fields', fields);
+            this.set('fields.logged_in', fields.logged_in);
+            this.set('fields.lastname', fields.lastname);
+            this.set('fields.name', fields.name[0] + '.');
+            if (fields.patronymic) this.set('fields.patronymic', fields.patronymic[0] + '.');
+
             if (fields.logged_in) {
               classes.add("online");
               classes.remove("offline");
@@ -103,6 +110,7 @@
               classes.remove("online");
               classes.add('offline');
             }
+
             this.$["user-icon"].updateStyles();
           });
 
