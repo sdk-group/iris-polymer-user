@@ -48,20 +48,24 @@
       
       #user-icon {
         border-radius: 50%;
+        padding: 14px;
       }
       
       #user-icon.blue {
-        padding: 14px;
         background-color: var(--paper-light-blue-600);
       }
       
+      #user-icon.beige {
+        background-color: #F4EBE0;
+      }
+      
       #user-icon.online {
-        box-shadow: 0 0 10px 2px rgba(0, 176, 0, 0.75);
+        box-shadow: 0 0 8px 4px rgba(0, 176, 0, 0.75);
       }
     </style>
     <paper-toolbar>
       <paper-icon-button icon="menu" on-tap="menuAction"></paper-icon-button>
-      <div id="user-icon" class="offline blue">
+      <div id="user-icon" class="offline beige">
         <iron-icon icon="social:person"></iron-icon>
       </div>
       <div class="fields ">
@@ -78,7 +82,9 @@
         </div>
       </div>
       <div class="actions flex">
-        <content></content>
+        <template is="dom-if" if="{{fields.logged_in}}">
+          <content></content>
+        </template>
       </div>
     </paper-toolbar>
 
@@ -111,7 +117,6 @@
               classes.add('offline');
             }
 
-            this.$["user-icon"].updateStyles();
           });
 
         },
