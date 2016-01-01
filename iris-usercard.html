@@ -6,6 +6,8 @@
 <link rel="import" href="../../bower_components/paper-toolbar/paper-toolbar.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
 
+<link rel="import" href="../../bower_components/iron-meta/iron-meta.html">
+
 <dom-module id="iris-usercard">
   <template>
     <style include="shared-styles"></style>
@@ -63,6 +65,8 @@
         box-shadow: 0 0 8px 4px rgba(0, 176, 0, 0.75);
       }
     </style>
+
+    <iron-meta id="meta"></iron-meta>
     <paper-toolbar>
       <paper-icon-button icon="menu" on-tap="menuAction"></paper-icon-button>
       <div id="user-icon" class="offline beige">
@@ -95,11 +99,10 @@
       'use strict';
       Polymer({
         is: 'iris-usercard',
-        properties: {
-          api: Object
-        },
+        properties: {},
         ready() {
-          let user = this.api.require('user');
+          let api = this.$.meta.byKey('api');
+          let user = api.require('user');
           this.info_open = false;
           this.fields = {};
           let classes = this.$["user-icon"].classList;
