@@ -103,7 +103,10 @@
           while (target && target !== this) {
             if (target.hasAttribute) {
               if (target.hasAttribute('user-logout')) {
-                this.$.user.logout();
+                this.$.user.logout()
+                  .then(() => {
+                    page('/');
+                  });
                 break;
               } else if (target.hasAttribute('user-break')) {
                 this.$.user.takeBreak();
