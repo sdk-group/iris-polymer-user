@@ -44,6 +44,10 @@
         float: right;
       }
       
+      .paused.online .actions >::content paper-button.action-break {
+        color: red;
+      }
+      
       .bottom.title {
         font-size: 12px;
       }
@@ -66,8 +70,8 @@
       }
     </style>
 
-    <iris-currentuser id="user" is-logged="{{logged_in}}" short-name="{{title}}"></iris-currentuser>
-    <paper-toolbar>
+    <iris-currentuser id="user" is-logged="{{logged_in}}" is-paused="{{paused}}" short-name="{{title}}"></iris-currentuser>
+    <paper-toolbar class$="{{userState(paused,logged_in)}}">
       <paper-icon-button icon="menu" on-tap="menuAction"></paper-icon-button>
       <div id="user-icon" class="offline beige">
         <iron-icon icon="social:person"></iron-icon>
@@ -115,6 +119,12 @@
             }
             target = target.parentNode;
           }
+        },
+        userState(paused, logged_in) {
+          console.log('us', paused, logged_in);
+          let p = (paused ? 'paused' : 'working');
+          let l = (logged_in ? 'online' : 'offline');
+          return p + ' ' + l;
         },
         menuAction() {
           this.fire('menu');
