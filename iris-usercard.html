@@ -2,7 +2,11 @@
 <link rel="import" href="../../bower_components/iris-polymer-importer/iris-importer.html">
 <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+
 <link rel="import" href="../../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/hardware-icons.html">
+
 <link rel="import" href="../../bower_components/paper-toolbar/paper-toolbar.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
 
@@ -74,7 +78,7 @@
     <paper-toolbar class$="{{userState(paused,logged_in)}}">
       <paper-icon-button icon="menu" on-tap="menuAction"></paper-icon-button>
       <div id="user-icon" class="offline beige">
-        <iron-icon icon="social:person"></iron-icon>
+        <iron-icon icon="perm-identity"></iron-icon>
       </div>
       <div class="fields ">
         <div class="middle title">
@@ -121,7 +125,6 @@
           }
         },
         userState(paused, logged_in) {
-          console.log('us', paused, logged_in);
           let p = (paused ? 'paused' : 'working');
           let l = (logged_in ? 'online' : 'offline');
           return p + ' ' + l;
