@@ -20,11 +20,15 @@
         display: block;
       }
       
-      .online-status.online {
+      .online .online-status {
         color: var(--paper-light-green-700);
       }
       
-      .online-status.offline {
+      .online.dead .online-status {
+        color: red;
+      }
+      
+      .offline .online-status {
         color: var(--paper-grey-500);
       }
       
@@ -72,12 +76,68 @@
       #user-icon.online {
         box-shadow: 0 0 8px 4px rgba(0, 176, 0, 0.75);
       }
+      
+      .online .bottom.title:after {
+        content: "в сети";
+      }
+      
+      .dead.online .bottom.title:after {
+        content: "переподключение";
+        color: red;
+      }
+      
+      @-webkit-keyframes rotating
+      /* Safari and Chrome */
+      
+      {
+        from {
+          -ms-transform: rotate(0deg);
+          -moz-transform: rotate(0deg);
+          -webkit-transform: rotate(0deg);
+          -o-transform: rotate(0deg);
+          transform: rotate(0deg);
+        }
+        to {
+          -ms-transform: rotate(360deg);
+          -moz-transform: rotate(360deg);
+          -webkit-transform: rotate(360deg);
+          -o-transform: rotate(360deg);
+          transform: rotate(360deg);
+        }
+      }
+      
+      @keyframes rotating {
+        from {
+          -ms-transform: rotate(0deg);
+          -moz-transform: rotate(0deg);
+          -webkit-transform: rotate(0deg);
+          -o-transform: rotate(0deg);
+          transform: rotate(0deg);
+        }
+        to {
+          -ms-transform: rotate(360deg);
+          -moz-transform: rotate(360deg);
+          -webkit-transform: rotate(360deg);
+          -o-transform: rotate(360deg);
+          transform: rotate(360deg);
+        }
+      }
+      
+      .dead.online .online-status {
+        -webkit-animation: rotating 2s linear infinite;
+        -moz-animation: rotating 2s linear infinite;
+        -ms-animation: rotating 2s linear infinite;
+        -o-animation: rotating 2s linear infinite;
+        animation: rotating 2s linear infinite;
+      }
     </style>
+    <iris-connection id="connection" is-alive="{{connectionAlive}}"></iris-connection>
 
     <iris-currentuser id="user" is-logged="{{logged_in}}" is-paused="{{paused}}" short-name="{{title}}"></iris-currentuser>
-    <paper-toolbar class$="{{userState(paused,logged_in)}}">
+
+    <paper-toolbar class$="{{userState(paused,logged_in,connectionAlive)}}">
       <paper-icon-button icon="menu" on-tap="menuAction"></paper-icon-button>
-      <div id="user-icon" class="offline beige">
+      <div id="user-icon" class="beige">
         <iron-icon icon="perm-identity"></iron-icon>
       </div>
       <div class="fields ">
@@ -85,12 +145,7 @@
           <span class="field">[[title]]</span>
         </div>
         <div class="bottom title">
-          <template is="dom-if" if="[[logged_in]]">
-            <iron-icon class="online-status online" icon="icons:radio-button-checked"></iron-icon> в сети
-          </template>
-          <template is="dom-if" if="[[!logged_in]]">
-            <iron-icon class="online-status offline" icon="icons:radio-button-unchecked"></iron-icon> не в сети
-          </template>
+          <iron-icon class="online-status" icon$="[[getIcon(logged_in,connectionAlive)]]"></iron-icon>
         </div>
       </div>
       <div class="actions flex" hidden$="[[!logged_in]]" on-tap="actionsClick">
@@ -124,10 +179,14 @@
             target = target.parentNode;
           }
         },
-        userState(paused, logged_in) {
-          let p = (paused ? 'paused' : 'working');
-          let l = (logged_in ? 'online' : 'offline');
-          return p + ' ' + l;
+        userState(paused, logged_in, connection_alive) {
+          let classes = [paused ? 'paused' : 'working', logged_in ? 'online' : 'offline', connection_alive ? 'alive' : 'dead']
+          return classes.join(' ');
+        },
+        getIcon(logged_in, alive) {
+          if (logged_in && !alive) return "icons:cached";
+
+          return logged_in ? 'icons:radio-button-checked' : "icons:radio-button-unchecked"
         },
         menuAction() {
           this.fire('menu');
