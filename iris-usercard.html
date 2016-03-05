@@ -18,6 +18,7 @@
     <style>
       :host {
         display: block;
+        --paper-toast-background-color: var(--mydoc-red-1000);
       }
       
       .online .online-status {
@@ -42,6 +43,10 @@
       
       .fields {
         padding-left: 15px;
+      }
+      
+      .offline .fields {
+        visibility: hidden;
       }
       
       iron-icon {
@@ -79,6 +84,10 @@
       
       .online .bottom.title:after {
         content: "в сети";
+      }
+      
+      .offline .bottom.title:after {
+        content: "не в сети";
       }
       
       .dead.online .bottom.title:after {
@@ -135,12 +144,14 @@
 
     <iris-currentuser id="user" is-logged="{{logged_in}}" is-paused="{{paused}}" short-name="{{title}}"></iris-currentuser>
 
+    <paper-toast id="breakToast" text="Необходимо завершить текущий вызов"></paper-toast>
+
     <paper-toolbar class$="{{userState(paused,logged_in,connectionAlive)}}">
       <paper-icon-button icon="menu" on-tap="menuAction"></paper-icon-button>
       <div id="user-icon" class="beige">
         <iron-icon icon="perm-identity"></iron-icon>
       </div>
-      <div class="fields ">
+      <div class="fields">
         <div class="middle title">
           <span class="field">[[title]]</span>
         </div>
@@ -172,7 +183,9 @@
                   });
                 break;
               } else if (target.hasAttribute('user-break')) {
-                this.$.user.takeBreak();
+                this.$.user.takeBreak().then(r => {
+                  if (!r.success && r.method == 'pause') this.$.breakToast.open();
+                });
                 break;
               }
             }
