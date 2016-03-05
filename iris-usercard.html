@@ -19,6 +19,7 @@
       :host {
         display: block;
         --paper-toast-background-color: var(--mydoc-red-1000);
+        --paper-toolbar-sm-height: 64px;
       }
       
       .online .online-status {
@@ -177,14 +178,14 @@
           while (target && target !== this) {
             if (target.hasAttribute) {
               if (target.hasAttribute('user-logout')) {
-                this.$.user.logout()
-                  .then(() => {
-                    page('/');
-                  });
+                this.$.user.logout().then(() => {
+                  page('/');
+                });
                 break;
               } else if (target.hasAttribute('user-break')) {
                 this.$.user.takeBreak().then(r => {
-                  if (!r.success && r.method == 'pause') this.$.breakToast.open();
+                  if (!r.success && r.method == 'pause')
+                    this.$.breakToast.open();
                 });
                 break;
               }
@@ -193,11 +194,16 @@
           }
         },
         userState(paused, logged_in, connection_alive) {
-          let classes = [paused ? 'paused' : 'working', logged_in ? 'online' : 'offline', connection_alive ? 'alive' : 'dead']
+          let classes = [
+            paused ? 'paused' : 'working',
+            logged_in ? 'online' : 'offline',
+            connection_alive ? 'alive' : 'dead'
+          ]
           return classes.join(' ');
         },
         getIcon(logged_in, alive) {
-          if (logged_in && !alive) return "icons:cached";
+          if (logged_in && !alive)
+            return "icons:cached";
 
           return logged_in ? 'icons:radio-button-checked' : "icons:radio-button-unchecked"
         },
