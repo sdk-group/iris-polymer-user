@@ -97,6 +97,10 @@
         color: red;
       }
       
+      paper-progress {
+        width: 100%;
+      }
+      
       @-webkit-keyframes rotating
       /* Safari and Chrome */
       
@@ -166,6 +170,12 @@
       </div>
     </paper-toolbar>
 
+    <paper-dialog id="logout-in-progress" modal opened="[[logoutInProgress]]">
+      <h2>Завершение сессии...</h2>
+      <paper-dialog-scrollable>
+        <paper-progress indeterminate></paper-progress>
+      </paper-dialog-scrollable>
+    </paper-dialog>
   </template>
 
   <script>
@@ -179,9 +189,22 @@
           while (target && target !== this) {
             if (target.hasAttribute) {
               if (target.hasAttribute('user-logout')) {
+                this.set('logoutInProgress', true);
                 this.$.user.logout().then(() => {
                   page('/');
+                  this.set('logoutInProgress', false);
+                }).catch((e) => {
+                  if (e.reason == "User cannot pause or logout with called tickets.") {
+                    Promise.resolve().delay(1000).then(() => {
+                      this.$.breakToast.open();
+                      this.set('logoutInProgress', false);
+                    })
+                  } else {
+                    this.set('logoutInProgress', false);
+                    console.log(e)
+                  }
                 });
+
                 break;
               } else if (target.hasAttribute('user-break')) {
                 this.$.user.takeBreak().then(r => {
