@@ -55,11 +55,11 @@
         margin-top: -1px;
       }
       
-      .actions >::content * {
+      .actions>::content * {
         float: right;
       }
       
-      .paused.online .actions >::content .action-break {
+      .paused.online .actions>::content .action-break {
         color: red;
       }
       
@@ -147,6 +147,8 @@
 
     <iris-currentuser id="user" is-logged="{{logged_in}}" is-paused="{{paused}}" short-name="{{title}}"></iris-currentuser>
 
+    <iris-workstation on-command-logout="doLogout"></iris-workstation>
+
     <paper-toast id="breakToast" text="Необходимо завершить текущий вызов"></paper-toast>
 
     <paper-toolbar class$="{{userState(paused,logged_in,connectionAlive)}}">
@@ -186,33 +188,38 @@
           while (target && target !== this) {
             if (target.hasAttribute) {
               if (target.hasAttribute('user-logout')) {
-                this.set('logoutInProgress', true);
-                this.$.user.logout().then(() => {
-                  page('/');
-                  this.set('logoutInProgress', false);
-                }).catch((e) => {
-                  if (e.reason == "User cannot pause or logout with called tickets.") {
-                    Promise.resolve().delay(1000).then(() => {
-                      this.$.breakToast.open();
-                      this.set('logoutInProgress', false);
-                    })
-                  } else {
-                    this.set('logoutInProgress', false);
-                    console.log(e)
-                  }
-                });
-
+                this.doLogout();
                 break;
               } else if (target.hasAttribute('user-break')) {
-                this.$.user.takeBreak().then(r => {
-                  if (!r.success && r.method == 'pause')
-                    this.$.breakToast.open();
-                });
+                this.doBreak();
                 break;
               }
             }
             target = target.parentNode;
           }
+        },
+        doLogout() {
+          this.set('logoutInProgress', true);
+          this.$.user.logout().then(() => {
+            page('/');
+            this.set('logoutInProgress', false);
+          }).catch((e) => {
+            if (e.reason == "User cannot pause or logout with called tickets.") {
+              Promise.resolve().delay(1000).then(() => {
+                this.$.breakToast.open();
+                this.set('logoutInProgress', false);
+              })
+            } else {
+              this.set('logoutInProgress', false);
+              console.log(e)
+            }
+          });
+        },
+        doBreak() {
+          this.$.user.takeBreak().then(r => {
+            if (!r.success && r.method == 'pause')
+              this.$.breakToast.open();
+          });
         },
         userState(paused, logged_in, connection_alive) {
           let classes = [
